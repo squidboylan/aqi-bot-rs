@@ -20,11 +20,11 @@ fn create_msg(data: purple_air::Response) -> String {
     format!(
         "id: {}, pm2.5 data: current {}; 10 min {}; 30 min {}; 6 hour {}; 24 hour {}",
         data.results[0].id,
-        data.results[0].stats.v,
-        data.results[0].stats.v1,
-        data.results[0].stats.v2,
-        data.results[0].stats.v4,
-        data.results[0].stats.v5
+        purple_air::raw_to_aqi(data.results[0].stats.v),
+        purple_air::raw_to_aqi(data.results[0].stats.v1),
+        purple_air::raw_to_aqi(data.results[0].stats.v2),
+        purple_air::raw_to_aqi(data.results[0].stats.v4),
+        purple_air::raw_to_aqi(data.results[0].stats.v5)
     )
 }
 

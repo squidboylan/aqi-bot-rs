@@ -7,6 +7,45 @@ use std::str::FromStr;
 
 use serde::de::{self, MapAccess, Visitor};
 
+const CONVERSION: [(f64, f64); 8] = [
+    (0.0, 0.0),
+    (12.1, 51.0),
+    (35.5, 101.0),
+    (55.5, 151.0),
+    (150.5, 201.0),
+    (250.5, 301.0),
+    (350.5, 401.0),
+    (500.5, 500.0),
+];
+
+fn create_url(id: u64) -> reqwest::Url {
+    let url = format!("https://www.purpleair.com/json?show={}", id,);
+    reqwest::Url::parse(&url).unwrap()
+}
+
+/// Convert a raw pm2.5 ug/m^3 value to AQI
+pub fn raw_to_aqi(raw: f64) -> f64 {
+    if raw >= 500.5 {
+        return 500.0;
+    }
+    let mut low = 0;
+    let mut high = 1;
+    while CONVERSION[high].0 < raw {
+        low += 1;
+        high += 1;
+    }
+
+    ((CONVERSION[high].1 - CONVERSION[low].1) / (CONVERSION[high].0 - CONVERSION[low].0))
+        * (raw - CONVERSION[low].0)
+        + CONVERSION[low].1
+}
+
+pub async fn get_sensor_data(id: u64) -> reqwest::Result<Response> {
+    let url = create_url(id);
+    let res = reqwest::get(url).await?.json::<Response>().await;
+    return res;
+}
+
 #[derive(Deserialize)]
 pub struct Response {
     pub results: Vec<Sensor>,
@@ -44,17 +83,6 @@ struct StatsTmp {
 }
 
 struct StatsVisitor;
-
-fn create_url(id: u64) -> reqwest::Url {
-    let url = format!("https://www.purpleair.com/json?show={}", id,);
-    reqwest::Url::parse(&url).unwrap()
-}
-
-pub async fn get_sensor_data(id: u64) -> reqwest::Result<Response> {
-    let url = create_url(id);
-    let res = reqwest::get(url).await?.json::<Response>().await;
-    return res;
-}
 
 impl<'de> Visitor<'de> for StatsVisitor {
     type Value = Stats;
