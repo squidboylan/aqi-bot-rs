@@ -1,11 +1,8 @@
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Deserializer};
 
-use std::collections::BTreeMap as Map;
 use std::fmt;
-use std::marker::PhantomData;
-use std::str::FromStr;
 
-use serde::de::{self, MapAccess, Visitor};
+use serde::de::{self, Visitor};
 
 const CONVERSION: [(f64, f64); 8] = [
     (0.0, 0.0),
