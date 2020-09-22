@@ -18,7 +18,7 @@ async fn send_msg(ctx: Context, msg: Message, data: &str) {
 
 fn create_msg(data: purple_air::Response) -> String {
     format!(
-        "id: {}, pm2.5 data: current {}; 10 min {}; 30 min {}; 6 hour {}; 24 hour {}",
+        "id: {}, pm2.5 data: current {:.1}; 10 min {:.1}; 30 min {:.1}; 6 hour {:.1}; 24 hour {:.1}",
         data.results[0].id,
         purple_air::raw_to_aqi(data.results[0].stats.v),
         purple_air::raw_to_aqi(data.results[0].stats.v1),
